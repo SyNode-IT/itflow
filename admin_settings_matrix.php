@@ -1,5 +1,5 @@
 <?php
-require_once "inc_all_admin.php";
+// require_once "inc_all_admin.php";
 
 if (!empty($_POST)) {
     if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
