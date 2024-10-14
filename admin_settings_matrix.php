@@ -37,3 +37,6 @@ require_once "admin_settings_matrix_functions.php"; // Inclure la logique backen
         <?php echo $alert; ?>
     </div>
 <?php endif; ?>
+
+<?php
+require_once "footer.php";
