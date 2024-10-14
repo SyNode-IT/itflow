@@ -1,8 +1,11 @@
 <?php
-// require_once "inc_all_admin.php";
+require_once "inc_all_admin.php";
+
+<?php include_once "inc_all.php"; // Inclusion des dépendances globales
 
 if (!empty($_POST)) {
-    if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+    // Vérification de la validité du token CSRF
+    if (!hash_equals($_POST['csrf_token'], $_SESSION['csrf_token'])) {
         $_SESSION['alert_type'] = "error";
         $_SESSION['alert_message'] = "CSRF Error Detected!";
         header("Location: admin_settings_matrix.php");
@@ -10,21 +13,25 @@ if (!empty($_POST)) {
     }
 }
 
-// Update Matrix Settings
+// Mise à jour des paramètres Matrix
 if (isset($_POST['edit_matrix_settings'])) {
     $matrix_server_url = sanitizeInput($_POST['matrix_server_url']);
     $matrix_api_key = sanitizeInput($_POST['matrix_api_key']);
     $matrix_room_id = sanitizeInput($_POST['matrix_room_id']);
 
     $sql = mysqli_prepare($mysqli, "UPDATE settings SET value = ? WHERE setting = ?");
+    
+    // Mise à jour URL du serveur Matrix
     mysqli_stmt_bind_param($sql, 'ss', $matrix_server_url, $param_setting);
     $param_setting = 'matrix_server_url';
     mysqli_stmt_execute($sql);
 
+    // Mise à jour de l'API Key
     mysqli_stmt_bind_param($sql, 'ss', $matrix_api_key, $param_setting);
     $param_setting = 'matrix_api_key';
     mysqli_stmt_execute($sql);
 
+    // Mise à jour de l'ID de la salle
     mysqli_stmt_bind_param($sql, 'ss', $matrix_room_id, $param_setting);
     $param_setting = 'matrix_room_id';
     mysqli_stmt_execute($sql);
@@ -38,7 +45,7 @@ if (isset($_POST['edit_matrix_settings'])) {
     exit();
 }
 
-// Send Test Notification
+// Envoi d'une notification de test
 if (isset($_POST['test_matrix_notification'])) {
     $matrix_server_url = get_setting($mysqli, 'matrix_server_url');
     $matrix_api_key = get_setting($mysqli, 'matrix_api_key');
@@ -59,15 +66,16 @@ if (isset($_POST['test_matrix_notification'])) {
     exit();
 }
 
-// Fetch current Matrix settings
+// Récupération des paramètres Matrix actuels
 $matrix_server_url = get_setting($mysqli, 'matrix_server_url');
 $matrix_api_key = get_setting($mysqli, 'matrix_api_key');
 $matrix_room_id = get_setting($mysqli, 'matrix_room_id');
 
-// Fetch recent notifications (for demonstration purposes)
+// Récupération des notifications récentes (pour démonstration)
 $sql = $mysqli->query("SELECT * FROM matrix_notifications ORDER BY id DESC LIMIT 10");
 $notifications = $sql->fetch_all(MYSQLI_ASSOC);
 
+// Fonction d'envoi de notification de test
 function send_test_matrix_notification($server_url, $api_key, $room_id, $message) {
     $url = $server_url . '/_matrix/client/r0/rooms/' . urlencode($room_id) . '/send/m.room.message?access_token=' . urlencode($api_key);
 
@@ -92,7 +100,7 @@ function send_test_matrix_notification($server_url, $api_key, $room_id, $message
         return false;
     }
 
-    // Log the sent notification (for demonstration purposes)
+    // Log de la notification envoyée
     global $mysqli;
     $sql = mysqli_prepare($mysqli, "INSERT INTO matrix_notifications (message, sent_at) VALUES (?, NOW())");
     mysqli_stmt_bind_param($sql, 's', $message);
@@ -104,6 +112,9 @@ function send_test_matrix_notification($server_url, $api_key, $room_id, $message
 
 ?>
 
+<?php include "inc_header.php"; ?>
+
+<!-- Formulaire de configuration Matrix -->
 <div class="card">
     <div class="card-header">
         <h1 class="h3 mb-0"><i class="fas fa-cog mr-2"></i>Matrix Notification Settings</h1>
@@ -140,6 +151,7 @@ function send_test_matrix_notification($server_url, $api_key, $room_id, $message
     </div>
 </div>
 
+<!-- Table des notifications récentes -->
 <div class="card mt-3">
     <div class="card-header">
         <h3 class="h4 mb-0"><i class="fas fa-history mr-2"></i>Recent Notifications</h3>
