@@ -114,9 +114,9 @@
                         <p>Mail Queue</p>
                     </a>
                 <li class="nav-item">
-                    <a href="admin_settings_matrix.php" class="nav-link <?php if (basename($_SERVER["PHP_SELF"]) == "admin_settings_matrix.php") {echo "active";} ?>">
+                    <a href="admin_settings_matrix.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'admin_settings_matrix.php' ? 'active' : ''); ?>">
                         <i class="nav-icon fas fa-bell"></i>
-                        <p>Paramètres Matrix</p>
+                        <p>Matrix</p>
                     </a>
                 </li>
                 </li>
